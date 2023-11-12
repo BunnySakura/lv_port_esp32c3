@@ -18,6 +18,7 @@
 #include "esp_freertos_hooks.h"
 #include "freertos/semphr.h"
 #include "esp_system.h"
+#include "esp_timer.h"
 #include "driver/gpio.h"
 
 /* Littlevgl specific */
@@ -209,6 +210,7 @@ static void create_demo_application(void)
 
 static void lv_tick_task(void *arg) {
     (void) arg;
+
 
     lv_tick_inc(LV_TICK_PERIOD_MS);
 }
