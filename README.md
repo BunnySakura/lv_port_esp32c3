@@ -187,6 +187,36 @@ error: implicit declaration of function 'gpio_matrix_out'; did you mean 'gpio_io
 
 ![合宙ESP32C3-LVGL适配-2](images/合宙ESP32C3-LVGL适配-2.jpg "合宙ESP32C3-LVGL适配-2")
 
+## 补充
+
+在前面《[配置编译环境](#配置编译环境 "配置编译环境")》一节中在配置`idf.py menuconfig`时，我提到`Select the demo you want to run.`这个设置测试demo的选项无效的情况，这是由于`main.c`中一个宏定义的问题。
+
+```cpp
+static void create_demo_application(void)
+{
+    /* When using a monochrome display we only show "Hello World" centered on the
+     * screen */
+#if defined CONFIG_LV_TFT_DISPLAY_MONOCHROME || \
+    defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_ST7735S
+    ……
+```
+
+宏定义`CONFIG_LV_TFT_DISPLAY_CONTROLLER_ST7735S`导致只能显示**Hello World**，但是实际上可能是出于分辨率较小的考量才禁用了ST7735S驱动芯片显示其他demo。
+
+可以手动在`main.c`添加头文件：
+
+```cpp
+#include "lv_examples/lv_examples.h"
+```
+
+然后执行`idf.py menuconfig`设置`Select the demo you want to run.`，选择你想运行的demo.
+
+最后在`create_demo_application`函数中调用你设置的demo对应的函数即可。
+
+这里我选择`Benchmark your system.`测试，结果如下：
+
+![合宙ESP32C3-LVGL适配-3](images/合宙ESP32C3-LVGL适配-3.jpg "合宙ESP32C3-LVGL适配-3")
+
 ## 完结撒花
 
 距离毕业时拿这块开发板做毕设已经过去一年了，感慨良多……
