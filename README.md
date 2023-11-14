@@ -51,18 +51,21 @@ idf.py build                    # 编译
 
 涉及引脚的配置查看合宙手册《[ESP32C3-CORE开发板]》、《[Air10x系列屏幕扩展板]》确定引脚号。
 
-| 参数                                                            | 值         | 备注                                             |
-|---------------------------------------------------------------|-----------|------------------------------------------------|
-| Display orientation                                           | Landscape | 横屏模式                                           |
-| Select a display controller model.                            | ST7735S   | 选择屏幕驱动芯片                                       |
-| Use custom SPI clock frequency.                               |           |                                                |
-| Select a custom frequency.                                    | 40 MHz    | 测试发现合宙这套设备80 MHz花屏，如果画面不稳定可适当调低                |
-| Invert colors in display                                      | 勾选        | 反转显示中的颜色，之前还有个颜色反转解决花屏问题，但是会出现黑白相反的反色情况，二者都需开启 |
-| Display Pin Assignments → GPIO for MOSI (Master Out Slave In) | 3         | MOSI引脚                                         |
-| Display Pin Assignments → GPIO for CLK (SCK / Serial Clock)   | 2         | CLK时钟引脚                                        |
-| Display Pin Assignments → GPIO for CS (Slave Select)          | 7         | 片选引脚                                           |
-| Display Pin Assignments → GPIO for DC (Data / Command)        | 6         | DC引脚                                           |
-| Display Pin Assignments → GPIO for Reset                      | 10        | 重置引脚                                           |
+| 参数                                                            | 值              | 备注                                             |
+|---------------------------------------------------------------|----------------|------------------------------------------------|
+| Display orientation                                           | Landscape      | 横屏模式                                           |
+| Select a display controller model.                            | ST7735S        | 选择屏幕驱动芯片                                       |
+| Use custom SPI clock frequency.                               | 勾选             | 自定义SPI时钟频率                                     |
+| Select a custom frequency.                                    | 40 MHz         | 测试发现合宙这套设备80 MHz花屏，如果画面不稳定可适当调低                |
+| Invert colors in display                                      | 勾选             | 反转显示中的颜色，之前还有个颜色反转解决花屏问题，但是会出现黑白相反的反色情况，二者都需开启 |
+| Display Pin Assignments → GPIO for MOSI (Master Out Slave In) | 3              | MOSI引脚                                         |
+| Display Pin Assignments → GPIO for CLK (SCK / Serial Clock)   | 2              | CLK时钟引脚                                        |
+| Display Pin Assignments → GPIO for CS (Slave Select)          | 7              | 片选引脚                                           |
+| Display Pin Assignments → GPIO for DC (Data / Command)        | 6              | DC引脚                                           |
+| Display Pin Assignments → GPIO for Reset                      | 10             | 重置引脚                                           |
+| Backlight Control (Switch control)                            | Switch control | 背光控制设为开关控制（需要更新组件，后面会提到）                       |
+| Is backlight turn on with a HIGH (1) logic level?             | 勾选             | 勾选表示高电平开启背光（需要更新组件，后面会提到）                      |
+| GPIO for Backlight Control                                    | 11             | 背光引脚（需要更新组件，后面会提到）                             |
 
 ### 消除`main.c`报错
 
@@ -125,30 +128,21 @@ error: 'portTICK_RATE_MS' undeclared (first use in this function); did you mean 
 ```text
 error: 'ledc_timer_config_t' has no member named 'bit_num'
 error: implicit declaration of function 'gpio_matrix_out'; did you mean 'gpio_iomux_out'?
-……
+error: implicit declaration of function 'gpio_pad_select_gpio'; did you mean 'esp_rom_gpio_pad_select_gpio'?
+error: 'SIG_GPIO_OUT_IDX' undeclared (first use in this function)
 ```
 
-这也是由于API变更导致`ledc_timer_config_t`结构体发生变化造成的，由于本次用不到背光相关内容，注释掉即可。
+- 由于API变更导致`ledc_timer_config_t`结构体发生变化，`bit_num`成员已弃用，参考官方《[LEDC外设版本迁移说明]》。将使用的成员变量名`bit_num`改为`duty_resolution`。
 
-并且由于更新组件`lvgl_esp32_drivers`新增了背光配置，还需要使用`idf.py menuconfig`修改`(Top) → Component config → LVGL ESP Drivers → LVGL TFT Display controller`中的`Backlight Control (Switch control)`，改为`Not Used`。
+| **删除/弃用项目**                        | **替代**                                 | **备注**    |
+|------------------------------------|----------------------------------------|-----------|
+| `ledc_timer_config_t` 中的 `bit_num` | `ledc_timer_config_t::duty_resolution` | 设置占空比分辨率。 |
 
-在`components/lvgl_esp32_drivers/CMakeLists.txt`注释掉：
+- `gpio_matrix_out`所在的头文件由`driver/gpio.h`变为了`rom/gpio.h`，更新之。
+- `gpio_pad_select_gpio`的问题在《[处理过时API不兼容问题]》小节出现过，替换为`esp_rom_gpio_pad_select_gpio`即可。
+- `SIG_GPIO_OUT_IDX`在头文件`soc/gpio_sig_map.h`，包含该头文件。
 
-```cmake
-# list(APPEND SOURCES "lvgl_tft/esp_lcd_backlight.c")
-```
-
-在`components/lvgl_esp32_drivers/lvgl_helpers.h`注释掉：
-
-```cpp
-// #include "lvgl_tft/esp_lcd_backlight.h" // 与IDF 5不兼容
-```
-
-在`components/lvgl_esp32_drivers/lvgl_tft/disp_driver.c`注释掉:
-
-```cpp
-// #include "lvgl_tft/esp_lcd_backlight.h" // 与IDF 5不兼容
-```
+代码的修改到此结束，不过由于组件`lvgl_esp32_drivers`更新新增了背光配置，还需要使用`idf.py menuconfig`修改`(Top) → Component config → LVGL ESP Drivers → LVGL TFT Display controller`中背光相关设置，按《[LVGL ESP Drivers]》小节修改即可。
 
 ### 烧录
 
@@ -251,9 +245,9 @@ o((>ω< ))o
 
 [error: 'CONFIG_LV_AXP192_PIN_SDA' undeclared #285]: https://github.com/lvgl/lv_port_esp32/issues/285 "error: 'CONFIG_LV_AXP192_PIN_SDA' undeclared #285"
 
-[ESP32 GPIO Configuration (gpio_pad_select_gpio)]: https://www.esp32.com/viewtopic.php?t=25505 "ESP32 GPIO Configuration (gpio_pad_select_gpio)"
+[处理过时API不兼容问题]: #处理过时API不兼容问题 "处理过时API不兼容问题"
 
-[FreeRTOS Support Archive]: https://www.freertos.org/FreeRTOS_Support_Forum_Archive/December_2006/freertos_What_does_portTICK_RATE_MS_stand_for_1636516.html "FreeRTOS Support Archive"
+[LVGL ESP Drivers]: #lvgl-esp-drivers "LVGL ESP Drivers"
 
 [\[教程\] esp32平台下运行lvgl，使用屏幕st7735s 128*128详细配置]: https://www.bilibili.com/read/cv14795850/ "\[教程\] esp32平台下运行lvgl，使用屏幕st7735s 128*128详细配置"
 
