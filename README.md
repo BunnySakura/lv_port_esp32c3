@@ -139,10 +139,10 @@ error: 'SIG_GPIO_OUT_IDX' undeclared (first use in this function)
 | `ledc_timer_config_t` 中的 `bit_num` | `ledc_timer_config_t::duty_resolution` | 设置占空比分辨率。 |
 
 - `gpio_matrix_out`所在的头文件由`driver/gpio.h`变为了`rom/gpio.h`，更新之。
-- `gpio_pad_select_gpio`的问题在《[处理过时API不兼容问题]》小节出现过，替换为`esp_rom_gpio_pad_select_gpio`即可。
+- `gpio_pad_select_gpio`的问题在《[处理过时API不兼容问题](#处理过时API不兼容问题 "处理过时API不兼容问题")》小节出现过，替换为`esp_rom_gpio_pad_select_gpio`即可。
 - `SIG_GPIO_OUT_IDX`在头文件`soc/gpio_sig_map.h`，包含该头文件。
 
-代码的修改到此结束，不过由于组件`lvgl_esp32_drivers`更新新增了背光配置，还需要使用`idf.py menuconfig`修改`(Top) → Component config → LVGL ESP Drivers → LVGL TFT Display controller`中背光相关设置，按《[LVGL ESP Drivers]》小节修改即可。
+代码的修改到此结束，不过由于组件`lvgl_esp32_drivers`更新新增了背光配置，还需要使用`idf.py menuconfig`修改`(Top) → Component config → LVGL ESP Drivers → LVGL TFT Display controller`中背光相关设置，按《[LVGL ESP Drivers](#LVGL ESP Drivers "LVGL ESP Drivers")》小节修改即可。
 
 ### 烧录
 
@@ -245,9 +245,9 @@ o((>ω< ))o
 
 [error: 'CONFIG_LV_AXP192_PIN_SDA' undeclared #285]: https://github.com/lvgl/lv_port_esp32/issues/285 "error: 'CONFIG_LV_AXP192_PIN_SDA' undeclared #285"
 
-[处理过时API不兼容问题]: #处理过时API不兼容问题 "处理过时API不兼容问题"
+[ESP32 GPIO Configuration (gpio_pad_select_gpio)]: https://www.esp32.com/viewtopic.php?t=25505 "ESP32 GPIO Configuration (gpio_pad_select_gpio)"
 
-[LVGL ESP Drivers]: #lvgl-esp-drivers "LVGL ESP Drivers"
+[FreeRTOS Support Archive]: https://www.freertos.org/FreeRTOS_Support_Forum_Archive/December_2006/freertos_What_does_portTICK_RATE_MS_stand_for_1636516.html "FreeRTOS Support Archive"
 
 [\[教程\] esp32平台下运行lvgl，使用屏幕st7735s 128*128详细配置]: https://www.bilibili.com/read/cv14795850/ "\[教程\] esp32平台下运行lvgl，使用屏幕st7735s 128*128详细配置"
 
