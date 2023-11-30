@@ -1,6 +1,30 @@
 # LVGL project for ESP32
 
-*基于**ESP-IDF v5.1.1**，将**LVGL v7.11.0**移植到合宙ESP32C3-CORE开发板，并适配合宙0.96寸屏幕拓展板。*
+*基于**ESP-IDF v5**，将**LVGL v8.3.10**移植到合宙ESP32C3-CORE开发板，并适配合宙0.96寸屏幕拓展板。*
+
+## 开始
+
+本项目已经为合宙的ESP32C3-CORE开发板和0.96寸屏幕拓展板配置完毕，编译烧录即可显示，显示效果如本文下方图片所示。
+
+```shell
+idf.py flash monitor
+```
+
+开发板和屏幕的连接参考B站相关视频，如[BV1RA4y1R73h]。
+
+二者均为元件面朝上，屏幕的按键和开发板的Type-C接口同向。且开发板焊排针，屏幕焊排母以便于调试。
+
+## 致谢
+
+- 感谢**LVGL**官方。
+- 感谢**hiruna**对[lv_port_esp32]的后续适配，在此基础上我分叉该库在`idf.py menuconfig`增加了ST7735S驱动芯片的偏移值配置，选中ST7735S后会出现两个偏移值设置。
+- 感谢**myfreax**提供的[显示例程]思路。
+
+---
+
+## 注意
+
+以下内容为`LVGL v7.11.0`的移植过程，对应分支`lvgl_7.11.0_idf_5.1.1`，仅供参考。
 
 ## 移植
 
@@ -139,10 +163,10 @@ error: 'SIG_GPIO_OUT_IDX' undeclared (first use in this function)
 | `ledc_timer_config_t` 中的 `bit_num` | `ledc_timer_config_t::duty_resolution` | 设置占空比分辨率。 |
 
 - `gpio_matrix_out`所在的头文件由`driver/gpio.h`变为了`rom/gpio.h`，更新之。
-- `gpio_pad_select_gpio`的问题在《[处理过时API不兼容问题]》小节出现过，替换为`esp_rom_gpio_pad_select_gpio`即可。
+- `gpio_pad_select_gpio`的问题在《[处理过时API不兼容问题](#处理过时API不兼容问题 "处理过时API不兼容问题")》小节出现过，替换为`esp_rom_gpio_pad_select_gpio`即可。
 - `SIG_GPIO_OUT_IDX`在头文件`soc/gpio_sig_map.h`，包含该头文件。
 
-代码的修改到此结束，不过由于组件`lvgl_esp32_drivers`更新新增了背光配置，还需要使用`idf.py menuconfig`修改`(Top) → Component config → LVGL ESP Drivers → LVGL TFT Display controller`中背光相关设置，按《[LVGL ESP Drivers]》小节修改即可。
+代码的修改到此结束，不过由于组件`lvgl_esp32_drivers`更新新增了背光配置，还需要使用`idf.py menuconfig`修改`(Top) → Component config → LVGL ESP Drivers → LVGL TFT Display controller`中背光相关设置，按《[LVGL ESP Drivers](#LVGL ESP Drivers "LVGL ESP Drivers")》小节修改即可。
 
 ### 烧录
 
@@ -225,6 +249,9 @@ o((>ω< ))o
 
 # 引用
 
+- [BV1RA4y1R73h]
+- [lv_port_esp32]
+- [显示例程]
 - [合宙ESP32C3使用PlatformIO开发点亮ST7735S]
 - [ESP32C3-CORE开发板]
 - [Air10x系列屏幕扩展板]
@@ -234,6 +261,12 @@ o((>ω< ))o
 - [FreeRTOS Support Archive]
 - [\[教程\] esp32平台下运行lvgl，使用屏幕st7735s 128*128详细配置]
 - [ESP32开发路程LVGL篇（一）——移植完整过程，花屏问题解决，ST7735显示方向]
+
+[BV1RA4y1R73h]: https://www.bilibili.com/video/BV1RA4y1R73h "BV1RA4y1R73h"
+
+[lv_port_esp32]: https://github.com/hiruna/lv_port_esp32/tree/develop/lvgl_8.3.7_idf_5.2 "lv_port_esp32"
+
+[显示例程]: https://github.com/myfreax/esp-idf-lvgl "显示例程"
 
 [合宙ESP32C3使用PlatformIO开发点亮ST7735S]: https://www.cnblogs.com/jianzhan/p/esp32c3_platformio_st7735s.html "合宙ESP32C3使用PlatformIO开发点亮ST7735S"
 
@@ -245,9 +278,9 @@ o((>ω< ))o
 
 [error: 'CONFIG_LV_AXP192_PIN_SDA' undeclared #285]: https://github.com/lvgl/lv_port_esp32/issues/285 "error: 'CONFIG_LV_AXP192_PIN_SDA' undeclared #285"
 
-[处理过时API不兼容问题]: #处理过时API不兼容问题 "处理过时API不兼容问题"
+[ESP32 GPIO Configuration (gpio_pad_select_gpio)]: https://www.esp32.com/viewtopic.php?t=25505 "ESP32 GPIO Configuration (gpio_pad_select_gpio)"
 
-[LVGL ESP Drivers]: #lvgl-esp-drivers "LVGL ESP Drivers"
+[FreeRTOS Support Archive]: https://www.freertos.org/FreeRTOS_Support_Forum_Archive/December_2006/freertos_What_does_portTICK_RATE_MS_stand_for_1636516.html "FreeRTOS Support Archive"
 
 [\[教程\] esp32平台下运行lvgl，使用屏幕st7735s 128*128详细配置]: https://www.bilibili.com/read/cv14795850/ "\[教程\] esp32平台下运行lvgl，使用屏幕st7735s 128*128详细配置"
 
