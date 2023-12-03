@@ -44,28 +44,28 @@ idf.py build                    # 编译
 |-------------------------------------------------------------------------------------------|-----|-------------------------|
 | Maximal horizontal resolution to support by the library.                                  | 160 | 水平分辨率                   |
 | Maximal vertical resolution to support by the library.                                    | 80  | 垂直分辨率                   |
-| Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI). | 勾选  | 颜色反转，不勾选颜色不对，官方建议SPI屏勾选 |
+| Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI). | 勾选  | 颜色反转，不勾选颜色乱的，官方建议SPI屏勾选 |
 | Feature usage → Show CPU usage and FPS count in the right bottom corner.                  | 勾选  | 显示帧率和CPU占用，便于调试         |
 
 #### LVGL ESP Drivers
 
 涉及引脚的配置查看合宙手册《[ESP32C3-CORE开发板]》、《[Air10x系列屏幕扩展板]》确定引脚号。
 
-| 参数                                                            | 值              | 备注                                             |
-|---------------------------------------------------------------|----------------|------------------------------------------------|
-| Display orientation                                           | Landscape      | 横屏模式                                           |
-| Select a display controller model.                            | ST7735S        | 选择屏幕驱动芯片                                       |
-| Use custom SPI clock frequency.                               | 勾选             | 自定义SPI时钟频率                                     |
-| Select a custom frequency.                                    | 40 MHz         | 测试发现合宙这套设备80 MHz花屏，如果画面不稳定可适当调低                |
-| Invert colors in display                                      | 勾选             | 反转显示中的颜色，之前还有个颜色反转解决花屏问题，但是会出现黑白相反的反色情况，二者都需开启 |
-| Display Pin Assignments → GPIO for MOSI (Master Out Slave In) | 3              | MOSI引脚                                         |
-| Display Pin Assignments → GPIO for CLK (SCK / Serial Clock)   | 2              | CLK时钟引脚                                        |
-| Display Pin Assignments → GPIO for CS (Slave Select)          | 7              | 片选引脚                                           |
-| Display Pin Assignments → GPIO for DC (Data / Command)        | 6              | DC引脚                                           |
-| Display Pin Assignments → GPIO for Reset                      | 10             | 重置引脚                                           |
-| Backlight Control (Switch control)                            | Switch control | 背光控制设为开关控制（需要更新组件，后面会提到）                       |
-| Is backlight turn on with a HIGH (1) logic level?             | 勾选             | 勾选表示高电平开启背光（需要更新组件，后面会提到）                      |
-| GPIO for Backlight Control                                    | 11             | 背光引脚（需要更新组件，后面会提到）                             |
+| 参数                                                            | 值              | 备注                              |
+|---------------------------------------------------------------|----------------|---------------------------------|
+| Display orientation                                           | Landscape      | 横屏模式                            |
+| Select a display controller model.                            | ST7735S        | 选择屏幕驱动芯片                        |
+| Use custom SPI clock frequency.                               | 勾选             | 自定义SPI时钟频率                      |
+| Select a custom frequency.                                    | 40 MHz         | 测试发现合宙这套设备80 MHz花屏，如果画面不稳定可适当调低 |
+| Invert colors in display                                      | 视硬件情况勾选        | 效果类似反相，即白色变为黑色，橙色变为蓝色……         |
+| Display Pin Assignments → GPIO for MOSI (Master Out Slave In) | 3              | MOSI引脚                          |
+| Display Pin Assignments → GPIO for CLK (SCK / Serial Clock)   | 2              | CLK时钟引脚                         |
+| Display Pin Assignments → GPIO for CS (Slave Select)          | 7              | 片选引脚                            |
+| Display Pin Assignments → GPIO for DC (Data / Command)        | 6              | DC引脚                            |
+| Display Pin Assignments → GPIO for Reset                      | 10             | 重置引脚                            |
+| Backlight Control (Switch control)                            | Switch control | 背光控制设为开关控制（需要更新组件，后面会提到）        |
+| Is backlight turn on with a HIGH (1) logic level?             | 勾选             | 勾选表示高电平开启背光（需要更新组件，后面会提到）       |
+| GPIO for Backlight Control                                    | 11             | 背光引脚（需要更新组件，后面会提到）              |
 
 ### 消除`main.c`报错
 
